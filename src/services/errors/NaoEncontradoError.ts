@@ -1,7 +1,7 @@
 // ==============================================================================
 // CAMADA: Negocio / Erros de Dominio (src/services/errors)
 // RESPONSABILIDADE: Representar erro de recurso nao encontrado no dominio sem conhecer HTTP 404
-// QUEM CHAMA ESTE ARQUIVO (de onde vem): EmprestimoService (lanca), tratarErro (mapeia para 404) e testes
+// QUEM CHAMA ESTE ARQUIVO (de onde vem): EmprestimoService (lanca) e tratarErro (mapeia para 404)
 // O QUE ESTE ARQUIVO CHAMA (para onde vai): Estende RegraDeNegocioError dentro da propria camada de servicos
 // BIBLIOTECAS: Nenhuma (TypeScript puro, sem dependencia de Express)
 // ==============================================================================

@@ -1,7 +1,7 @@
 // ==============================================================================
 // CAMADA: Negocio / Services (src/services)
 // RESPONSABILIDADE: Aplicar regras de validacao e unicidade de e-mail ao cadastrar usuarios
-// QUEM CHAMA ESTE ARQUIVO (de onde vem): UsuarioController (Presentation), routes.ts (instancia) e testes unitarios
+// QUEM CHAMA ESTE ARQUIVO (de onde vem): UsuarioController (Presentation) e routes.ts (instancia na composicao raiz)
 // O QUE ESTE ARQUIVO CHAMA (para onde vai): Contrato IUsuarioRepository (DIP), entidade Usuario e RegraDeNegocioError
 // BIBLIOTECAS: Nenhuma (nao conhece Express nem PostgreSQL/pg)
 // ==============================================================================

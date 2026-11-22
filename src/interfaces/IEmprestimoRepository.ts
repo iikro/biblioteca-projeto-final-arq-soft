@@ -1,7 +1,7 @@
 // ==============================================================================
 // CAMADA: Contratos / Interfaces DIP (src/interfaces)
 // RESPONSABILIDADE: Definir o contrato abstrato de persistencia de emprestimos (DIP e ISP)
-// QUEM CHAMA ESTE ARQUIVO (de onde vem): EmprestimoService (depende desta abstracao), EmprestimoRepository e fake de teste (implementam)
+// QUEM CHAMA ESTE ARQUIVO (de onde vem): EmprestimoService (depende desta abstracao) e EmprestimoRepository (implementa)
 // O QUE ESTE ARQUIVO CHAMA (para onde vai): Importa apenas a entidade Emprestimo (camada de dominio)
 // BIBLIOTECAS: Nenhuma (TypeScript puro)
 // ==============================================================================

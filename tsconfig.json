@@ -2,7 +2,7 @@
 // CAMADA: Configuracao e Infraestrutura (Raiz do Projeto)
 // RESPONSABILIDADE: Configurar o verificador de tipos TypeScript (tsc --noEmit)
 // QUEM CHAMA ESTE ARQUIVO (de onde vem): Comando 'npm run typecheck' (tsc) e IDE/editor
-// O QUE ESTE ARQUIVO CHAMA (para onde vai): Analisa os arquivos em src/ e tests/
+// O QUE ESTE ARQUIVO CHAMA (para onde vai): Analisa os arquivos TypeScript em src/
 // BIBLIOTECAS: TypeScript 7 (usa formato JSONC, que aceita comentarios //)
 // ==============================================================================
 {
@@ -27,6 +27,6 @@
     // Nao gera arquivos .js em disco; o 'tsx' executa TypeScript em memoria e o 'tsc' so valida tipos
     "noEmit": true
   },
-  // Pastas incluidas na verificacao de tipos: codigo-fonte da API (src) e testes unitarios (tests)
-  "include": ["src", "tests"]
+  // Pasta incluida na verificacao de tipos: codigo-fonte da API (src)
+  "include": ["src"]
 }

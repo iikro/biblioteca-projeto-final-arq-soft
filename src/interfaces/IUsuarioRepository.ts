@@ -1,7 +1,7 @@
 // ==============================================================================
 // CAMADA: Contratos / Interfaces DIP (src/interfaces)
 // RESPONSABILIDADE: Definir o contrato abstrato de persistencia de usuarios (DIP e ISP)
-// QUEM CHAMA ESTE ARQUIVO (de onde vem): UsuarioService, EmprestimoService (dependem desta abstracao), UsuarioRepository e fakes de teste (implementam)
+// QUEM CHAMA ESTE ARQUIVO (de onde vem): UsuarioService, EmprestimoService (dependem desta abstracao) e UsuarioRepository (implementa)
 // O QUE ESTE ARQUIVO CHAMA (para onde vai): Importa apenas a entidade Usuario (camada de dominio)
 // BIBLIOTECAS: Nenhuma (TypeScript puro)
 // ==============================================================================

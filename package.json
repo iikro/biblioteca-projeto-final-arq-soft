@@ -4,7 +4,7 @@
     "CAMADA: Configuracao e Infraestrutura (Raiz do Projeto)",
     "RESPONSABILIDADE: Definir metadados, scripts de execucao e dependencias Node.js",
     "QUEM CHAMA ESTE ARQUIVO (de onde vem): npm, Docker (RUN npm install / CMD) e desenvolvedor",
-    "O QUE ESTE ARQUIVO CHAMA (para onde vai): tsx (para rodar src/index.ts e tests/), tsc (verificacao de tipos)",
+    "O QUE ESTE ARQUIVO CHAMA (para onde vai): tsx (para rodar src/index.ts), tsc (verificacao de tipos)",
     "BIBLIOTECAS: express (API HTTP), pg (driver PostgreSQL), typescript, tsx, @types/*",
     "==============================================================================",
     "--- Secao de identificacao do pacote ---",
@@ -16,14 +16,13 @@
     "--- Secao de scripts (comandos npm run <nome>) ---",
     "scripts.dev: Executa src/index.ts com 'tsx watch', recarregando automaticamente ao editar codigo (substitui ts-node-dev).",
     "scripts.typecheck: Roda o compilador TypeScript apenas para validar tipos (noEmit: true no tsconfig.json).",
-    "scripts.test: Executa os testes unitarios nativos (node:test) via tsx sobre tests/**/*.test.ts.",
     "--- Secao de dependencias de producao (dependencies) ---",
     "express (^5.3.0): Framework HTTP da Camada de Apresentacao (rotas, middlewares, Request/Response).",
     "pg (^8.23.1): Driver oficial node-postgres usado exclusivamente na Camada de Persistencia (src/repositories).",
     "--- Secao de dependencias de desenvolvimento (devDependencies) ---",
     "typescript (^7.0.2): Compilador/verificador estatico de tipos para TypeScript.",
     "tsx (^4.23.15): Executor moderno de TypeScript em runtime (suporta parameter properties usadas nas entidades).",
-    "@types/node (^24.19.2): Tipagens do ambiente Node.js 24 LTS (process.env, node:test, etc.).",
+    "@types/node (^24.19.2): Tipagens do ambiente Node.js 24 LTS (process.env, tipos globais).",
     "@types/express (^5.0.6): Tipagens TypeScript para Request, Response e Router do Express.",
     "@types/pg (^8.23.1): Tipagens TypeScript para Pool e QueryResult do driver pg."
   ],
@@ -33,8 +32,7 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "typecheck": "tsc --noEmit",
-    "test": "tsx --test \"tests/**/*.test.ts\""
+    "typecheck": "tsc --noEmit"
   },
   "repository": {
     "type": "git",

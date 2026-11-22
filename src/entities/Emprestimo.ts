@@ -1,7 +1,7 @@
 // ==============================================================================
 // CAMADA: Dominio / Entidades (src/entities)
 // RESPONSABILIDADE: Representar o registro de um Emprestimo vinculando Usuario e Livro
-// QUEM CHAMA ESTE ARQUIVO (de onde vem): Interfaces, Repositories, Services e testes
+// QUEM CHAMA ESTE ARQUIVO (de onde vem): Interfaces, Repositories e Services
 // O QUE ESTE ARQUIVO CHAMA (para onde vai): Nenhuma dependencia externa (nucleo puro do dominio)
 // BIBLIOTECAS: Nenhuma (TypeScript puro)
 // ==============================================================================

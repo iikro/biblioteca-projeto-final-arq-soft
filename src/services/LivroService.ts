@@ -1,7 +1,7 @@
 // ==============================================================================
 // CAMADA: Negocio / Services (src/services)
 // RESPONSABILIDADE: Aplicar as regras de negocio de cadastro e listagem de livros
-// QUEM CHAMA ESTE ARQUIVO (de onde vem): LivroController (Presentation), routes.ts (instancia) e testes unitarios
+// QUEM CHAMA ESTE ARQUIVO (de onde vem): LivroController (Presentation) e routes.ts (instancia na composicao raiz)
 // O QUE ESTE ARQUIVO CHAMA (para onde vai): Contrato ILivroRepository (DIP), entidade Livro e RegraDeNegocioError
 // BIBLIOTECAS: Nenhuma (nao conhece Express nem PostgreSQL/pg)
 // ==============================================================================

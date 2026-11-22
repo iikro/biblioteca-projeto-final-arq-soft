@@ -1,7 +1,7 @@
 // ==============================================================================
 // CAMADA: Contratos / Interfaces DIP (src/interfaces)
 // RESPONSABILIDADE: Definir o contrato abstrato de persistencia de livros (DIP e ISP)
-// QUEM CHAMA ESTE ARQUIVO (de onde vem): LivroService, EmprestimoService (dependem desta abstracao), LivroRepository e fakes de teste (implementam)
+// QUEM CHAMA ESTE ARQUIVO (de onde vem): LivroService, EmprestimoService (dependem desta abstracao) e LivroRepository (implementa)
 // O QUE ESTE ARQUIVO CHAMA (para onde vai): Importa apenas a entidade Livro (camada de dominio)
 // BIBLIOTECAS: Nenhuma (TypeScript puro)
 // ==============================================================================

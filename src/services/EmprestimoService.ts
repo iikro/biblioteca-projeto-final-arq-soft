@@ -1,7 +1,7 @@
 // ==============================================================================
 // CAMADA: Negocio / Services (src/services)
 // RESPONSABILIDADE: Orquestrar validacoes e execucao de emprestimos de livros para usuarios
-// QUEM CHAMA ESTE ARQUIVO (de onde vem): EmprestimoController (Presentation), routes.ts (instancia) e testes unitarios
+// QUEM CHAMA ESTE ARQUIVO (de onde vem): EmprestimoController (Presentation) e routes.ts (instancia na composicao raiz)
 // O QUE ESTE ARQUIVO CHAMA (para onde vai): Interfaces IEmprestimoRepository, ILivroRepository, IUsuarioRepository e erros
 // BIBLIOTECAS: Nenhuma (nao conhece Express nem PostgreSQL/pg)
 // ==============================================================================

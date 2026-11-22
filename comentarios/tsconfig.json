@@ -1,0 +1,32 @@
+// ==============================================================================
+// CAMADA: Configuracao e Infraestrutura (Raiz do Projeto)
+// RESPONSABILIDADE: Configurar o verificador de tipos TypeScript (tsc --noEmit)
+// QUEM CHAMA ESTE ARQUIVO (de onde vem): Comando 'npm run typecheck' (tsc) e IDE/editor
+// O QUE ESTE ARQUIVO CHAMA (para onde vai): Analisa os arquivos TypeScript em src/
+// BIBLIOTECAS: TypeScript 7 (usa formato JSONC, que aceita comentarios //)
+// ==============================================================================
+{
+  // Bloco principal com as opcoes do compilador TypeScript
+  "compilerOptions": {
+    // Define a versao de JavaScript alvo (ES2022 e totalmente suportado pelo Node.js 24 LTS)
+    "target": "ES2022",
+    // Define o sistema de resolucao de modulos Node moderno mantendo compatibilidade com package.json type: commonjs
+    "module": "nodenext",
+    // Algoritmo de resolucao de imports alinhado ao Node.js (TS 7 removeu o antigo node10)
+    "moduleResolution": "nodenext",
+    // Declara explicitamente os tipos globais do Node (obrigatorio no TS 6+, pois o padrao agora e array vazio [])
+    "types": ["node"],
+    // Ativa todas as verificacoes estritas de tipo (noImplicitAny, strictNullChecks, etc.)
+    "strict": true,
+    // Permite importar pacotes CommonJS (como 'express') usando sintaxe ES import default
+    "esModuleInterop": true,
+    // Ignora checagem interna de arquivos .d.ts em node_modules para agilizar a verificacao
+    "skipLibCheck": true,
+    // Garante que maiusculas e minusculas em nomes de arquivos importados batam no macOS e no Linux (Docker)
+    "forceConsistentCasingInFileNames": true,
+    // Nao gera arquivos .js em disco; o 'tsx' executa TypeScript em memoria e o 'tsc' so valida tipos
+    "noEmit": true
+  },
+  // Pasta incluida na verificacao de tipos: codigo-fonte da API (src)
+  "include": ["src"]
+}

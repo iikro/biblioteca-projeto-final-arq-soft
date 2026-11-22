@@ -1,19 +1,5 @@
-# ==============================================================================
-# CAMADA: Infraestrutura de Containerizacao (Raiz do Projeto)
-# RESPONSABILIDADE: Excluir arquivos locais do contexto enviado ao daemon Docker durante o build
-# QUEM CHAMA ESTE ARQUIVO (de onde vem): Docker Build / Docker Compose ao executar COPY . . no Dockerfile
-# O QUE ESTE ARQUIVO CHAMA (para onde vai): Impede copia indevida de binarios do macOS e historico Git para dentro da imagem
-# BIBLIOTECAS: Docker
-# ==============================================================================
-
-# Critico: impede copiar node_modules do macOS para o Linux Alpine (evita incompatibilidade do binario nativo esbuild usado pelo tsx)
 node_modules
-
-# Ignora eventual pasta de compilacao local para manter a imagem limpa
 dist
-
-# Ignora o historico do repositorio Git, pois o container precisa apenas do codigo-fonte atual
 .git
-
-# Ignora logs locais de execucao que nao devem ir para a imagem da API
+comentarios
 *.log

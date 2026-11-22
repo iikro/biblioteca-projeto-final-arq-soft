@@ -66,7 +66,8 @@ projeto-final/
 ├── init.sql                               # DDL PostgreSQL que cria as tabelas usuarios, livros e emprestimos
 ├── package.json                           # Scripts, dependências (express, pg, tsx, typescript) e comentários "//"
 ├── package-lock.json                      # Trava determinística das versões instaladas
-├── tsconfig.json                          # Configuração estrita do verificador de tipos TypeScript (JSONC)
+├── tsconfig.json                          # Configuração estrita do verificador de tipos TypeScript (JSON puro)
+├── comentarios/                           # Cópia didática de src/ e raiz comentada linha a linha para estudo
 ├── docs/
 │   ├── TUTORIAL.md                        # Este guia completo de arquitetura, código e execução
 │   └── ROTEIRO_APRESENTACAO.md            # Roteiro de slides (20 min) e arguição com o professor
@@ -264,9 +265,10 @@ erDiagram
 
 ## 10. Guia Arquivo por Arquivo
 
-- **`package.json`**: Define scripts (`dev`, `typecheck`), dependências (`express`, `pg`, `typescript`, `tsx`, `@types/*`) e documenta tudo na chave `"//"`.
-- **`tsconfig.json`**: Configura TypeScript estrito (`strict: true`, `module: "nodenext"`, `types: ["node"]`, `noEmit: true`) cobrindo `src/`.
-- **`.gitignore` / `.dockerignore`**: Mantêm `node_modules` fora do Git e impedem que binários compilados para macOS (como o `esbuild` do `tsx`) entrem na imagem Linux Alpine.
+- **`package.json`**: Define scripts (`dev`, `typecheck`) e dependências (`express`, `pg`, `typescript`, `tsx`, `@types/*`) em formato limpo para produção (a versão comentada com `"//"` está em `comentarios/package.json`).
+- **`tsconfig.json`**: Configura TypeScript estrito (`strict: true`, `module: "nodenext"`, `types: ["node"]`, `noEmit: true`) cobrindo `src/` em JSON puro.
+- **`.gitignore` / `.dockerignore`**: Mantêm `node_modules` fora do Git e impedem que binários compilados para macOS (como o `esbuild` do `tsx`) e a pasta `comentarios/` entrem na imagem Linux Alpine.
+- **`comentarios/`**: Preserva a cópia integral de todos os arquivos de `src/` e da raiz com comentários linha a linha explicando camada, origem, destino e bibliotecas, separada do código original limpo.
 - **`Dockerfile`**: Usa `node:24-alpine`, instala dependências dentro do Linux e inicia com `npm run dev`.
 - **`docker-compose.yml`**: Sobe `biblioteca_db` (Postgres 15 com `init.sql` e `healthcheck` TCP) e `biblioteca_api` (`depends_on: service_healthy`), mapeando `${DB_HOST_PORT:-5434}:5432` para o host.
 - **`init.sql`**: Script DDL que cria `usuarios`, `livros` e `emprestimos`.
@@ -305,7 +307,9 @@ Cada etapa da construção foi registrada em um commit atômico e enviada ao Git
 | 14 | `abea4e1` | `docs: tutorial completo de construcao, comunicacao e execucao` | Primeira versão de `docs/TUTORIAL.md` e atualização do `README.md` |
 | 15 | `284b474` | `docs: roteiro de apresentacao em slides` | Primeira versão de `docs/ROTEIRO_APRESENTACAO.md` |
 | 16 | `73ab423` | `chore: remove testes unitarios, script demo e referencias em codigo` | Limpeza do projeto para manter apenas o código essencial da apresentação |
-| 17 | *(este passo)* | `docs: atualiza documentacao e roteiro removendo itens nao essenciais` | Atualização do `README.md`, `docs/TUTORIAL.md` e `docs/ROTEIRO_APRESENTACAO.md` |
+| 17 | `4c4e176` | `docs: atualiza documentacao e roteiro removendo itens nao essenciais` | Atualização do `README.md`, `docs/TUTORIAL.md` e `docs/ROTEIRO_APRESENTACAO.md` |
+| 18 | `f8beb56` | `docs: copia codigo comentado para pasta comentarios` | Cópia fiel dos 28 arquivos comentados para `comentarios/` |
+| 19 | *(este passo)* | `refactor: remove todos os comentarios do codigo original` | Remoção de todos os comentários nos arquivos originais (`src/` e raiz) mantendo versão comentada em `comentarios/` |
 
 > **Nota didática sobre o commit `4ed7977` (`fix`)**: Ao subir os containers pela primeira vez, o Docker reportou `Bind for 0.0.0.0:5433 failed: port is already allocated`, pois a máquina já possuía um PostgreSQL local na porta `5432` e outro container do usuário (`postgres_padrao`) na `5433`. Alterar o mapeamento para `${DB_HOST_PORT:-5434}:5432` e atualizar o fallback em `PostgresDb.ts` para `'5434'` resolveu o conflito mantendo a rede interna `db:5432` intacta.
 

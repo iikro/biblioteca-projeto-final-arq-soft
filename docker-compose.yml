@@ -1,71 +1,32 @@
-# ==============================================================================
-# CAMADA: Orquestracao de Containers (Raiz do Projeto)
-# RESPONSABILIDADE: Subir a API (Node/Express) e o banco PostgreSQL em containers separados na mesma rede
-# QUEM CHAMA ESTE ARQUIVO (de onde vem): Comando 'docker compose up --build' executado pelo desenvolvedor
-# O QUE ESTE ARQUIVO CHAMA (para onde vai): Imagem postgres:15-alpine (com init.sql) e Dockerfile da API
-# BIBLIOTECAS: Docker Compose v2+ (sem a chave obsoleta 'version')
-# ==============================================================================
-
-# Bloco principal que declara os servicos (containers) que compoem o sistema
 services:
-  # Servico do banco de dados relacional PostgreSQL (camada mais baixa da arquitetura)
   db:
-    # Imagem oficial do PostgreSQL 15 leve baseada em Alpine Linux (mantida e estavel)
     image: postgres:15-alpine
-    # Nome fixo do container no Docker para facilitar visualizacao de logs e inspecao
     container_name: biblioteca_db
-    # Variaveis de ambiente lidas pela imagem do Postgres na primeira inicializacao
     environment:
-      # Nome do superusuario administrativo criado no banco
       POSTGRES_USER: admin
-      # Senha do usuario administrativo (entre aspas para o YAML manter como string '123')
       POSTGRES_PASSWORD: "123"
-      # Nome do banco de dados inicial criado automaticamente para o sistema de biblioteca
       POSTGRES_DB: biblioteca
-    # Mapeamento de portas host:container
     ports:
-      # Porta no host configuravel via DB_HOST_PORT (padrao 5434 pois 5432 tem Postgres local e 5433 outro container; na rede Docker segue 5432)
       - "${DB_HOST_PORT:-5434}:5432"
-    # Montagem de volumes entre o host e o container
     volumes:
-      # Executa o script init.sql na primeira criacao do volume do banco (cria tabelas usuarios, livros e emprestimos)
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    # Verificacao de saude para garantir que a API so suba quando o Postgres estiver pronto via TCP
     healthcheck:
-      # Usa -h 127.0.0.1 para testar conexao TCP real e evitar falso positivo enquanto o init.sql roda via socket Unix
       test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U admin -d biblioteca"]
-      # Intervalo de espera entre cada tentativa de verificacao de saude
       interval: 5s
-      # Tempo maximo que cada execucao do comando pg_isready pode levar
       timeout: 5s
-      # Numero de falhas consecutivas antes de marcar o container como unhealthy
       retries: 10
 
-  # Servico da API REST (Monolito em Camadas escrito em TypeScript/Express)
   api:
-    # Constroi a imagem da API usando o Dockerfile localizado na raiz deste projeto
     build: .
-    # Nome fixo do container da aplicacao Node.js/Express
     container_name: biblioteca_api
-    # Mapeamento de portas para acesso externo via navegador, curl, Postman ou Insomnia
     ports:
-      # Expoe a porta 3000 do container na porta 3000 da maquina host
       - "3000:3000"
-    # Variaveis de ambiente injetadas na aplicacao (lidas em src/repositories/PostgresDb.ts)
     environment:
-      # Nome do servico do banco na rede interna criada pelo Docker Compose (resolve para o container 'db')
       DB_HOST: db
-      # Usuario para autenticacao do pool de conexoes pg
       DB_USER: admin
-      # Senha do usuario do banco (entre aspas para garantir tipo string)
       DB_PASSWORD: "123"
-      # Nome do banco de dados alvo das queries SQL
       DB_NAME: biblioteca
-      # Porta interna do Postgres dentro da rede Docker (5432, diferente da porta 5433 exposta para o host)
       DB_PORT: "5432"
-    # Ordem e condicao de inicializacao entre containers
     depends_on:
-      # Declara dependencia explicita no servico 'db'
       db:
-        # Aguarda o healthcheck do Postgres passar antes de iniciar o processo Node.js da API
         condition: service_healthy

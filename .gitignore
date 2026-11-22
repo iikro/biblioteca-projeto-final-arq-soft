@@ -1,22 +1,5 @@
-# ==============================================================================
-# CAMADA: Configuracao de Controle de Versao (Raiz do Projeto)
-# RESPONSABILIDADE: Impedir que dependencias instaladas, builds e segredos entrem no Git
-# QUEM CHAMA ESTE ARQUIVO (de onde vem): Git (git status / git add / git commit)
-# O QUE ESTE ARQUIVO CHAMA (para onde vai): Filtra arquivos rastreados no repositorio remoto GitHub
-# BIBLIOTECAS: Git
-# ==============================================================================
-
-# Ignora a pasta de dependencias Node baixadas pelo npm (sao reinstaladas via package-lock.json)
 node_modules/
-
-# Ignora eventual pasta de compilacao JavaScript caso alguem execute tsc sem --noEmit
 dist/
-
-# Ignora arquivos de variaveis de ambiente locais que possam conter senhas ou configuracoes privadas
 .env
-
-# Ignora arquivos ocultos de metadados de pastas criados automaticamente pelo macOS Finder
 .DS_Store
-
-# Ignora arquivos de log de execucao ou erros gerados localmente pelo npm/Node
 *.log

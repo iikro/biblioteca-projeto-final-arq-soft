@@ -31,5 +31,6 @@ npm run typecheck
 
 ## Documentação Completa
 
+- O código original na raiz e em `src/` está limpo (sem comentários), enquanto a cópia integral **comentada linha a linha para estudo** está preservada na pasta [comentarios/](comentarios/).
 - [Tutorial Completo de Construção, Comunicação e Execução](docs/TUTORIAL.md)
 - [Roteiro de Apresentação em Slides e Arguição (20 min)](docs/ROTEIRO_APRESENTACAO.md)

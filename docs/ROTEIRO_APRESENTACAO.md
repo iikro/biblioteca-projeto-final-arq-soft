@@ -177,7 +177,7 @@ Este roteiro organiza a apresentação acadêmica do **Sistema de Gerenciamento 
 - **O que mostrar:**
   - Resumo visual: `Organizado em camadas` + `Desacoplado via DIP` + `Portável via Docker`.
 - **Notas de fala:**
-  - *"Concluindo, entregamos um sistema limpo, totalmente comentado e estruturado em camadas fechadas, onde cada arquivo tem uma responsabilidade única e respeita o fluxo de cima para baixo. Ficamos à disposição para as perguntas da arguição."*
+  - *"Concluindo, entregamos um sistema com código original limpo e versão comentada linha a linha em `comentarios/`, estruturado em camadas fechadas, onde cada arquivo tem uma responsabilidade única e respeita o fluxo de cima para baixo. Ficamos à disposição para as perguntas da arguição."*
 
 ---
 

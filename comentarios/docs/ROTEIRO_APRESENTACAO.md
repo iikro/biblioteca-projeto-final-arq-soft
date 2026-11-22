@@ -62,7 +62,7 @@ Este roteiro organiza a apresentação acadêmica do **Sistema de Gerenciamento 
   - **Direção única:** Requisição entra na Rota → Controller → Service → Interface → Repository → PostgreSQL.
   - **Benefício:** Simplicidade operacional sem abrir mão de baixo acoplamento e clareza arquitetural.
 - **O que mostrar:**
-  - Diagrama de blocos vertical de `docs/TUTORIAL.md` (Seção 5):
+  - Diagrama de blocos vertical de `comentarios/docs/TUTORIAL.md` (Seção 5):
     `Cliente HTTP -> Controllers (Presentation) -> Services (Business) -> Interfaces (DIP) <- Repositories (Persistence) -> PostgreSQL`.
 - **Notas de fala:**
   - *"Escolhemos o Monolito em Camadas porque, para um sistema com 3 entidades, distribuir em microsserviços traria complexidade acidental de rede sem ganho real. O segredo para esse monolito não virar código espaguete é impor a regra das camadas fechadas: a requisição desce camada por camada, e nenhuma camada pula a vizinha."*
@@ -109,7 +109,7 @@ Este roteiro organiza a apresentação acadêmica do **Sistema de Gerenciamento 
   - 4. `EmprestimoService`: valida IDs, busca usuário (`IUsuarioRepository`), busca livro (`ILivroRepository`), checa disponibilidade, grava empréstimo (`IEmprestimoRepository`) e marca livro como `disponivel = false`.
   - 5. `EmprestimoController`: devolve `201 Created` com JSON.
 - **O que mostrar:**
-  - O `sequenceDiagram` de `docs/TUTORIAL.md` (Seção 8) mostrando a chamada percorrendo cada camada até o PostgreSQL e retornando.
+  - O `sequenceDiagram` de `comentarios/docs/TUTORIAL.md` (Seção 8) mostrando a chamada percorrendo cada camada até o PostgreSQL e retornando.
 - **Notas de fala:**
   - *"Acompanhando uma requisição real de empréstimo, vemos a fronteira clara de responsabilidades: o Controller só entende HTTP (`req`, `res`, status `201`). Toda a orquestração de regras fica no `EmprestimoService`, que conversa com três interfaces de repositório distintas antes de devolver a entidade pronta."*
 
@@ -154,7 +154,7 @@ Este roteiro organiza a apresentação acadêmica do **Sistema de Gerenciamento 
 - **Conteúdo na tela (bullets):**
   - Subida do ambiente no terminal: `docker compose up --build`.
   - Verificar logs: `biblioteca_db` `healthy` e `Servidor rodando na porta 3000`.
-  - Chamar as rotas no Postman/Insomnia (payloads prontos em `docs/TUTORIAL.md`):
+  - Chamar as rotas no Postman/Insomnia (payloads prontos em `comentarios/docs/TUTORIAL.md`):
     1. `POST /usuarios` → **201 Created**.
     2. `POST /livros` → **201 Created** (`disponivel: true`).
     3. `GET /livros` → **200 OK**.

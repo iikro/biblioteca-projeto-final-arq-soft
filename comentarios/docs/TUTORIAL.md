@@ -67,10 +67,10 @@ projeto-final/
 ├── package.json                           # Scripts, dependências (express, pg, tsx, typescript) e comentários "//"
 ├── package-lock.json                      # Trava determinística das versões instaladas
 ├── tsconfig.json                          # Configuração estrita do verificador de tipos TypeScript (JSON puro)
-├── comentarios/                           # Cópia didática de src/ e raiz comentada linha a linha para estudo
-├── docs/
-│   ├── TUTORIAL.md                        # Este guia completo de arquitetura, código e execução
-│   └── ROTEIRO_APRESENTACAO.md            # Roteiro de slides (20 min) e arguição com o professor
+├── comentarios/                           # Cópia didática de src/ e raiz comentada linha a linha + documentação
+│   └── docs/
+│       ├── TUTORIAL.md                    # Este guia completo de arquitetura, código e execução
+│       └── ROTEIRO_APRESENTACAO.md        # Roteiro de slides (20 min) e arguição com o professor
 └── src/
     ├── index.ts                           # Inicialização do servidor Express na porta 3000
     ├── routes.ts                          # Composição raiz (DI manual) e registro das 5 rotas HTTP
@@ -309,7 +309,8 @@ Cada etapa da construção foi registrada em um commit atômico e enviada ao Git
 | 16 | `73ab423` | `chore: remove testes unitarios, script demo e referencias em codigo` | Limpeza do projeto para manter apenas o código essencial da apresentação |
 | 17 | `4c4e176` | `docs: atualiza documentacao e roteiro removendo itens nao essenciais` | Atualização do `README.md`, `docs/TUTORIAL.md` e `docs/ROTEIRO_APRESENTACAO.md` |
 | 18 | `f8beb56` | `docs: copia codigo comentado para pasta comentarios` | Cópia fiel dos 28 arquivos comentados para `comentarios/` |
-| 19 | *(este passo)* | `refactor: remove todos os comentarios do codigo original` | Remoção de todos os comentários nos arquivos originais (`src/` e raiz) mantendo versão comentada em `comentarios/` |
+| 19 | `8ef5292` | `refactor: remove todos os comentarios do codigo original` | Remoção de todos os comentários nos arquivos originais (`src/` e raiz) mantendo versão comentada em `comentarios/` |
+| 20 | *(este passo)* | `chore: move pasta docs para dentro de comentarios` | Move `docs/` para `comentarios/docs/` e atualiza referências |
 
 > **Nota didática sobre o commit `4ed7977` (`fix`)**: Ao subir os containers pela primeira vez, o Docker reportou `Bind for 0.0.0.0:5433 failed: port is already allocated`, pois a máquina já possuía um PostgreSQL local na porta `5432` e outro container do usuário (`postgres_padrao`) na `5433`. Alterar o mapeamento para `${DB_HOST_PORT:-5434}:5432` e atualizar o fallback em `PostgresDb.ts` para `'5434'` resolveu o conflito mantendo a rede interna `db:5432` intacta.
 

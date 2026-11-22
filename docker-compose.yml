@@ -24,8 +24,8 @@ services:
       POSTGRES_DB: biblioteca
     # Mapeamento de portas host:container
     ports:
-      # Expoe na porta 5433 do host (macOS) para nao conflitar com um Postgres local na 5432; internamente continua 5432
-      - "5433:5432"
+      # Porta no host configuravel via DB_HOST_PORT (padrao 5434 pois 5432 tem Postgres local e 5433 outro container; na rede Docker segue 5432)
+      - "${DB_HOST_PORT:-5434}:5432"
     # Montagem de volumes entre o host e o container
     volumes:
       # Executa o script init.sql na primeira criacao do volume do banco (cria tabelas usuarios, livros e emprestimos)

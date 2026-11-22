@@ -2,7 +2,7 @@
 // CAMADA: Persistencia / Infraestrutura de Banco (src/repositories)
 // RESPONSABILIDADE: Criar e exportar o Pool de conexoes reutilizaveis com o PostgreSQL
 // QUEM CHAMA ESTE ARQUIVO (de onde vem): LivroRepository, UsuarioRepository e EmprestimoRepository
-// O QUE ESTE ARQUIVO CHAMA (para onde vai): Conecta-se ao servidor PostgreSQL (container 'db' ou localhost:5433)
+// O QUE ESTE ARQUIVO CHAMA (para onde vai): Conecta-se ao servidor PostgreSQL (container 'db' ou localhost:5434)
 // BIBLIOTECAS: 'pg' (node-postgres, usado EXCLUSIVAMENTE na camada de persistencia)
 // ==============================================================================
 
@@ -19,7 +19,7 @@ export const pool = new Pool({
   password: process.env.DB_PASSWORD || '123',
   // Nome do banco de dados criado pelo container Postgres ('biblioteca')
   database: process.env.DB_NAME || 'biblioteca',
-  // Porta TCP: no Docker DB_PORT='5432'; fora do Docker usa '5433' para evitar conflito com Postgres local na 5432
-  port: parseInt(process.env.DB_PORT || '5433', 10),
+  // Porta TCP: no Docker DB_PORT='5432'; fora do Docker aponta para a porta 5434 exposta pelo docker-compose (evita conflito com 5432/5433)
+  port: parseInt(process.env.DB_PORT || '5434', 10),
 // Encerra o objeto de configuracao e a instanciacao do Pool
 });

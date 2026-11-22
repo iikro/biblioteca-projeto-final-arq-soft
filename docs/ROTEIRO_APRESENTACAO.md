@@ -1,6 +1,6 @@
 # Roteiro de Apresentação em Slides (20 Minutos) + Arguição
 
-Este roteiro organiza a apresentação acadêmica do **Sistema de Gerenciamento de Biblioteca** em **11 slides**, totalizando exatamente **20 minutos** (expansão detalhada da Seção 5 do guia do projeto), seguido das respostas preparadas para a **arguição do professor** (Seção 6 + perguntas adicionais prováveis).
+Este roteiro organiza a apresentação acadêmica do **Sistema de Gerenciamento de Biblioteca** em **10 slides**, totalizando exatamente **20 minutos** (expansão detalhada da Seção 5 do guia do projeto), seguido das respostas preparadas para a **arguição do professor** (Seção 6 + perguntas adicionais prováveis).
 
 ---
 
@@ -12,14 +12,13 @@ Este roteiro organiza a apresentação acadêmica do **Sistema de Gerenciamento 
 | Slide 2 | Domínio e Problema | 1 min 30 s |
 | Slide 3 | Arquitetura Escolhida: Monolito em Camadas | 2 min |
 | Slide 4 | Camadas Fechadas na Prática (Pastas e Imports) | 2 min |
-| Slide 5 | DIP e Injeção Manual de Dependência (DI) | 2 min 30 s |
+| Slide 5 | DIP e Injeção Manual de Dependência (DI) | 3 min |
 | Slide 6 | Fluxo Completo de uma Requisição | 2 min |
 | Slide 7 | Regras de Negócio e Tratamento de Erros | 1 min 30 s |
-| Slide 8 | Testes Unitários em Memória (Prova do DIP) | 1 min 30 s |
-| Slide 9 | Requisitos Técnicos e Containers Docker | 2 min |
-| Slide 10 | Demonstração ao Vivo (`docker compose up --build`) | 3 min |
-| Slide 11 | Conclusão e Próximos Passos | 1 min |
-| **Total** | **11 slides** | **20 min** |
+| Slide 8 | Requisitos Técnicos e Containers Docker | 2 min |
+| Slide 9 | Demonstração ao Vivo (`docker compose up --build` + Postman/Insomnia) | 4 min |
+| Slide 10 | Conclusão e Próximos Passos | 1 min |
+| **Total** | **10 slides** | **20 min** |
 
 ---
 
@@ -61,7 +60,7 @@ Este roteiro organiza a apresentação acadêmica do **Sistema de Gerenciamento 
   - **O que é:** Uma única unidade implantável (*deployable unit*) dividida logicamente em camadas horizontais por responsabilidade técnica.
   - **Regra cumprida:** **Camadas Fechadas** (*Closed Layers*).
   - **Direção única:** Requisição entra na Rota → Controller → Service → Interface → Repository → PostgreSQL.
-  - **Benefício:** Simplicidade operacional sem abrir mão de baixo acoplamento e testabilidade.
+  - **Benefício:** Simplicidade operacional sem abrir mão de baixo acoplamento e clareza arquitetural.
 - **O que mostrar:**
   - Diagrama de blocos vertical de `docs/TUTORIAL.md` (Seção 5):
     `Cliente HTTP -> Controllers (Presentation) -> Services (Business) -> Interfaces (DIP) <- Repositories (Persistence) -> PostgreSQL`.
@@ -86,7 +85,7 @@ Este roteiro organiza a apresentação acadêmica do **Sistema de Gerenciamento 
 ---
 
 ### Slide 5: DIP e Injeção Manual de Dependência (DI)
-- **Tempo:** 2 min 30 s
+- **Tempo:** 3 min
 - **Conteúdo na tela (bullets):**
   - **DIP (Dependency Inversion Principle):** O negócio (`Service`) depende da abstração (`Interface`), não do PostgreSQL.
   - **ISP (Interface Segregation Principle):** Cada interface expõe só o que os serviços precisam.
@@ -97,7 +96,7 @@ Este roteiro organiza a apresentação acadêmica do **Sistema de Gerenciamento 
     2. Construtor de `src/services/LivroService.ts` (`constructor(private livroRepository: ILivroRepository)`);
     3. Bloco de montagem manual em `src/routes.ts` (`new LivroRepository()` → `new LivroService(livroRepo)` → `new LivroController(livroService)`).
 - **Notas de fala:**
-  - *"Este é o coração arquitetural do projeto. Olhem o construtor do `LivroService`: ele recebe `ILivroRepository`, que é apenas uma interface TypeScript. Ele não sabe que existe PostgreSQL. Quem decide qual banco usar é exclusivamente o arquivo `src/routes.ts`, onde fazemos a injeção manual de dependências. Isso dá controle explícito sem esconder nada atrás de frameworks mágicos."*
+  - *"Este é o coração arquitetural do projeto. Olhem o construtor do `LivroService`: ele recebe `ILivroRepository`, que é apenas uma interface TypeScript. Ele não sabe que existe PostgreSQL. Quem decide qual banco usar é exclusivamente o arquivo `src/routes.ts`, onde fazemos a injeção manual de dependências. Isso dá controle explícito sem esconder nada atrás de frameworks mágicos, e garante pelo compilador TypeScript que o Service jamais dependa da implementação concreta."*
 
 ---
 
@@ -134,21 +133,7 @@ Este roteiro organiza a apresentação acadêmica do **Sistema de Gerenciamento 
 
 ---
 
-### Slide 8: Testes Unitários em Memória (Prova Prática do DIP)
-- **Tempo:** 1 min 30 s
-- **Conteúdo na tela (bullets):**
-  - 3 dublês em `tests/fakes/`: `LivroRepositoryEmMemoria`, `UsuarioRepositoryEmMemoria`, `EmprestimoRepositoryEmMemoria`.
-  - **14 testes unitários** em `tests/services/` usando `node:test` + `node:assert/strict` (sem banco real).
-  - Executam em ~220 ms via `npm test`.
-  - Comprovam que as regras de negócio funcionam 100% isoladas da infraestrutura.
-- **O que mostrar:**
-  - Print de `tests/services/EmprestimoService.test.ts` (mostrando `criarCenario()` injetando os fakes em memória) e a saída verde do terminal com `npm test` (`pass 14`, `fail 0`).
-- **Notas de fala:**
-  - *"Como provar que o DIP funcionou? Rodando toda a camada de negócio sem subir o PostgreSQL! Criamos implementações em memória das três interfaces em `tests/fakes/` e injetamos nos mesmos Services usados em produção. Os 14 testes rodam em menos de um segundo e validam todas as regras críticas."*
-
----
-
-### Slide 9: Requisitos Técnicos e Infraestrutura Docker
+### Slide 8: Requisitos Técnicos e Infraestrutura Docker
 - **Tempo:** 2 min
 - **Conteúdo na tela (bullets):**
   - Código versionado no **GitHub** com histórico incremental de commits atômicos por camada.
@@ -164,35 +149,35 @@ Este roteiro organiza a apresentação acadêmica do **Sistema de Gerenciamento 
 
 ---
 
-### Slide 10: Demonstração ao Vivo
-- **Tempo:** 3 min
+### Slide 9: Demonstração ao Vivo (Docker + Postman / Insomnia)
+- **Tempo:** 4 min
 - **Conteúdo na tela (bullets):**
-  - Subida do ambiente: `docker compose up --build` (ou `./scripts/demo.sh` para automação rápida).
-  - Roteiro da demonstração ao vivo:
-    1. Mostrar logs: `biblioteca_db` `healthy` e `Servidor rodando na porta 3000`.
-    2. `POST /usuarios` → **201 Created**.
-    3. `POST /livros` → **201 Created** (`disponivel: true`).
-    4. `GET /livros` → **200 OK**.
-    5. `POST /emprestimos` → **201 Created** (empréstimo válido).
-    6. Repetir o mesmo `POST /emprestimos` → **400 Bad Request**: `{"erro":"Livro já está emprestado."}`.
-    7. `GET /livros` → confirmar que o livro passou para `disponivel: false`.
+  - Subida do ambiente no terminal: `docker compose up --build`.
+  - Verificar logs: `biblioteca_db` `healthy` e `Servidor rodando na porta 3000`.
+  - Chamar as rotas no Postman/Insomnia (payloads prontos em `docs/TUTORIAL.md`):
+    1. `POST /usuarios` → **201 Created**.
+    2. `POST /livros` → **201 Created** (`disponivel: true`).
+    3. `GET /livros` → **200 OK**.
+    4. `POST /emprestimos` → **201 Created** (empréstimo válido).
+    5. Repetir o mesmo `POST /emprestimos` → **400 Bad Request**: `{"erro":"Livro já está emprestado."}`.
+    6. `GET /emprestimos` e `GET /livros` → confirmar que o livro passou para `disponivel: false`.
 - **O que mostrar:**
-  - Terminal rodando `docker compose up --build` + Postman/Insomnia (ou `./scripts/demo.sh`) executando cada chamada ao vivo.
+  - Terminal rodando `docker compose up --build` + Postman/Insomnia executando cada chamada ao vivo.
 - **Notas de fala:**
-  - *"Vamos agora para a demonstração ao vivo. Subindo com `docker compose up --build`, observamos o healthcheck do banco passar primeiro e só depois a API iniciar na porta 3000. Agora criamos um usuário, criamos um livro, listamos o acervo e realizamos o empréstimo. Ao tentar emprestar o mesmo livro novamente, o `EmprestimoService` bloqueia com HTTP 400 e a mensagem `'Livro já está emprestado.'`."*
+  - *"Vamos agora para a demonstração ao vivo. Subindo com `docker compose up --build`, observamos o healthcheck do banco passar primeiro e só depois a API iniciar na porta 3000. No Postman, criamos um usuário, criamos um livro, listamos o acervo e realizamos o empréstimo. Ao tentar emprestar o mesmo livro novamente, o `EmprestimoService` bloqueia com HTTP 400 e a mensagem `'Livro já está emprestado.'`, e na nova listagem o livro já aparece com `disponivel: false`."*
 
 ---
 
-### Slide 11: Conclusão e Evolução
+### Slide 10: Conclusão e Evolução
 - **Tempo:** 1 min
 - **Conteúdo na tela (bullets):**
   - Arquitetura em **Camadas Fechadas** garantiu código previsível, fácil de ler e manter.
-  - **DIP + DI manual** permitiram testar regras sem banco e facilitam evolução futura.
+  - **DIP + DI manual** isolaram a regra de negócio da infraestrutura e facilitam evolução futura.
   - **Próximos passos naturais:** transação SQL no empréstimo, rota de devolução e paginação.
 - **O que mostrar:**
-  - Resumo visual: `Organizado em camadas` + `Testável via DIP` + `Portável via Docker`.
+  - Resumo visual: `Organizado em camadas` + `Desacoplado via DIP` + `Portável via Docker`.
 - **Notas de fala:**
-  - *"Concluindo, entregamos um sistema limpo, totalmente comentado e testado, onde cada arquivo tem uma responsabilidade única e respeita o fluxo de cima para baixo. Ficamos à disposição para as perguntas da arguição."*
+  - *"Concluindo, entregamos um sistema limpo, totalmente comentado e estruturado em camadas fechadas, onde cada arquivo tem uma responsabilidade única e respeita o fluxo de cima para baixo. Ficamos à disposição para as perguntas da arguição."*
 
 ---
 
@@ -220,7 +205,7 @@ Este roteiro organiza a apresentação acadêmica do **Sistema de Gerenciamento 
 
 ### Pergunta 5: *"Como vocês têm certeza de que o DIP está realmente funcionando no código?"*
 - **Resposta:**
-  *"Temos duas provas objetivas no repositório: primeiro, a auditoria estática de imports mostra zero referências a `pg` ou `repositories` dentro de `src/services/` e `src/controllers/`; segundo, os 14 testes unitários em `tests/services/` executam toda a lógica real de `LivroService`, `UsuarioService` e `EmprestimoService` usando repositórios em memória (`tests/fakes/`), sem precisar de Docker nem PostgreSQL."*
+  *"Temos três garantias objetivas diretamente no código: primeiro, a auditoria estática de imports (`grep`) confirma zero referências a `pg` ou `src/repositories` dentro de `src/services/` e `src/controllers/`; segundo, a checagem de tipos do TypeScript (`npm run typecheck` com `strict: true`) garante que os Services recebem apenas as interfaces em `src/interfaces/` (`ILivroRepository`, `IUsuarioRepository`, `IEmprestimoRepository`), recusando qualquer método específico do banco que não esteja no contrato; e terceiro, toda a ligação concreta fica isolada em um único ponto na Composição Raiz (`src/routes.ts`), permitindo substituir qualquer implementação de repositório sem tocar nos Services."*
 
 ### Pergunta 6: *"O que acontece se o container do PostgreSQL cair no meio de uma requisição, e por que usar Monolito em vez de Microsserviços aqui?"*
 - **Resposta:**

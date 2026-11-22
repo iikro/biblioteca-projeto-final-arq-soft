@@ -27,12 +27,6 @@ DB_HOST_PORT=5433 docker compose up --build
 
 # Rodar checagem de tipos TypeScript
 npm run typecheck
-
-# Rodar os 14 testes unitários (sem precisar de Docker ou banco ativo)
-npm test
-
-# Executar demonstração automatizada das 5 rotas com curl (com a API rodando)
-./scripts/demo.sh
 ```
 
 ## Documentação Completa

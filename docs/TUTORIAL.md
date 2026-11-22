@@ -1,6 +1,6 @@
 # Tutorial Completo: Sistema de Biblioteca (Monolito em Camadas Fechadas + DIP)
 
-Este tutorial explica, passo a passo, **como o projeto foi construído**, **como cada arquivo e camada se comunica**, **por que cada decisão técnica foi tomada** e **como executar e testar tudo** — pensado tanto para um estudante entendendo Arquitetura de Software na prática quanto para a avaliação acadêmica de um professor da disciplina.
+Este tutorial explica, passo a passo, **como o projeto foi construído**, **como cada arquivo e camada se comunica**, **por que cada decisão técnica foi tomada** e **como executar e validar toda a API** — pensado tanto para um estudante entendendo Arquitetura de Software na prática quanto para a avaliação acadêmica de um professor da disciplina.
 
 ---
 
@@ -28,9 +28,8 @@ Escopo funcional do sistema:
 | **Express** | `^5.3.0` | Camada de Apresentação (`src/controllers`, `src/routes.ts`, `src/index.ts`) | Framework HTTP minimalista e didático para roteamento, `express.json()` e manipulação de `Request`/`Response`. |
 | **pg (node-postgres)** | `^8.23.1` | Camada de Persistência (`src/repositories`) | Driver oficial PostgreSQL com suporte a `Pool` de conexões e queries parametrizadas (`$1, $2...`) contra SQL injection. |
 | **TypeScript** | `^7.0.2` | Verificação estática de tipos (`npm run typecheck`) | Garante contratos rígidos (interfaces DIP, entidades, `strict: true`) sem necessidade de gerar arquivos `.js` em disco (`noEmit: true`). |
-| **tsx** | `^4.23.15` | Executor TypeScript em desenvolvimento (`npm run dev` e `npm test`) | Substitui o antigo `ts-node-dev` (sem manutenção). Necessário mesmo no Node 24 porque o Node nativo não suporta *parameter properties* (`constructor(public id: number...)`). |
-| **@types/node, @types/express, @types/pg** | `^24` / `^5` / `^8` | Tipagens de desenvolvimento | Fornecem autocompletar e checagem de tipos do Express, `pg` e APIs nativas do Node (`process.env`, `node:test`). |
-| **node:test + node:assert/strict** | Nativo do Node 24 | Testes unitários (`tests/services/*.test.ts`) | Runner e asserções embutidos no próprio Node.js, sem precisar instalar frameworks pesados como Jest. |
+| **tsx** | `^4.23.15` | Executor TypeScript em desenvolvimento (`npm run dev`) | Substitui o antigo `ts-node-dev` (sem manutenção). Necessário mesmo no Node 24 porque o Node nativo não suporta *parameter properties* (`constructor(public id: number...)`). |
+| **@types/node, @types/express, @types/pg** | `^24` / `^5` / `^8` | Tipagens de desenvolvimento | Fornecem autocompletar e checagem de tipos do Express, `pg` e variáveis de ambiente (`process.env`). |
 | **Docker & Docker Compose** | Compose v2+ | Infraestrutura e orquestração | Isola a API (`biblioteca_api`) e o PostgreSQL (`biblioteca_db`) em containers separados e reproduzíveis. |
 | **PostgreSQL** | `15-alpine` | Banco de dados relacional | SGBD robusto, leve em Alpine e com inicialização automática via `init.sql`. |
 
@@ -51,9 +50,7 @@ O projeto seguiu fielmente a arquitetura e o código-base do documento guia, apl
 | **7** | `postgres:15-alpine` | Mantido `postgres:15-alpine` | Versão ainda oficialmente suportada, leve e alinhada ao guia. |
 | **8** | `id_usuario INT` e `id_livro INT` sem `NOT NULL` | Adicionado `NOT NULL` nas FKs de `emprestimos` | Impede no nível do banco a existência de um empréstimo órfão sem usuário ou sem livro. |
 | **9** | `throw new Error(...)` com `catch (error: any)` | `RegraDeNegocioError` (→400) e `NaoEncontradoError` (→404) + `tratarErro(erro: unknown)` | O Service não deve conhecer HTTP, mas precisa distinguir erro de validação (400) de recurso inexistente (404) e erro inesperado (500), mantendo tipagem estrita sem `any`. |
-| **10** | Sem suíte de testes no PDF | Testes unitários dos 3 Services em `tests/` com repositórios em memória | Valida todas as regras de negócio sem banco real e **prova o DIP na prática**: os Services aceitam fakes em memória porque dependem de interfaces. |
-| **11** | 5 rotas + devolução mencionada apenas na arguição | Exatamente as 5 rotas implementadas; devolução mantida para a arguição | Cumpre exatamente o tamanho definido no guia (`1 app, 3 entidades, 5 rotas`) e preserva a pergunta clássica de extensão da arguição. |
-| **12** | Uso manual do Postman/Insomnia | `scripts/demo.sh` automatizado com `curl` + exemplos JSON neste tutorial | Permite demonstrar todo o fluxo no terminal com um único comando e fornece payloads prontos para colar no Postman/Insomnia. |
+| **10** | 5 rotas + devolução mencionada apenas na arguição | Exatamente as 5 rotas implementadas; devolução mantida para a arguição | Cumpre exatamente o tamanho definido no guia (`1 app, 3 entidades, 5 rotas`) e preserva a pergunta clássica de extensão da arguição. |
 
 ---
 
@@ -73,45 +70,34 @@ projeto-final/
 ├── docs/
 │   ├── TUTORIAL.md                        # Este guia completo de arquitetura, código e execução
 │   └── ROTEIRO_APRESENTACAO.md            # Roteiro de slides (20 min) e arguição com o professor
-├── scripts/
-│   └── demo.sh                            # Demonstração automatizada das 5 rotas + erro 400 via curl
-├── src/
-│   ├── index.ts                           # Inicialização do servidor Express na porta 3000
-│   ├── routes.ts                          # Composição raiz (DI manual) e registro das 5 rotas HTTP
-│   ├── entities/                          # CAMADA DE DOMÍNIO (sem dependências externas)
-│   │   ├── Emprestimo.ts
-│   │   ├── Livro.ts
-│   │   └── Usuario.ts
-│   ├── interfaces/                        # CONTRATOS DIP / ISP (importam apenas Entities)
-│   │   ├── IEmprestimoRepository.ts
-│   │   ├── ILivroRepository.ts
-│   │   └── IUsuarioRepository.ts
-│   ├── repositories/                      # CAMADA DE PERSISTÊNCIA (importam Interfaces, Entities e pg)
-│   │   ├── EmprestimoRepository.ts
-│   │   ├── LivroRepository.ts
-│   │   ├── PostgresDb.ts
-│   │   └── UsuarioRepository.ts
-│   ├── services/                          # CAMADA DE NEGÓCIO (importam apenas Interfaces, Entities e Errors)
-│   │   ├── EmprestimoService.ts
-│   │   ├── LivroService.ts
-│   │   ├── UsuarioService.ts
-│   │   └── errors/
-│   │       ├── NaoEncontradoError.ts
-│   │       └── RegraDeNegocioError.ts
-│   └── controllers/                       # CAMADA DE APRESENTAÇÃO (importam Express, Services e Errors)
-│       ├── EmprestimoController.ts
-│       ├── LivroController.ts
-│       ├── UsuarioController.ts
-│       └── tratarErro.ts
-└── tests/                                 # TESTES UNITÁRIOS SEM BANCO DE DADOS (prova do DIP)
-    ├── fakes/
-    │   ├── EmprestimoRepositoryEmMemoria.ts
-    │   ├── LivroRepositoryEmMemoria.ts
-    │   └── UsuarioRepositoryEmMemoria.ts
-    └── services/
-        ├── EmprestimoService.test.ts
-        ├── LivroService.test.ts
-        └── UsuarioService.test.ts
+└── src/
+    ├── index.ts                           # Inicialização do servidor Express na porta 3000
+    ├── routes.ts                          # Composição raiz (DI manual) e registro das 5 rotas HTTP
+    ├── entities/                          # CAMADA DE DOMÍNIO (sem dependências externas)
+    │   ├── Emprestimo.ts
+    │   ├── Livro.ts
+    │   └── Usuario.ts
+    ├── interfaces/                        # CONTRATOS DIP / ISP (importam apenas Entities)
+    │   ├── IEmprestimoRepository.ts
+    │   ├── ILivroRepository.ts
+    │   └── IUsuarioRepository.ts
+    ├── repositories/                      # CAMADA DE PERSISTÊNCIA (importam Interfaces, Entities e pg)
+    │   ├── EmprestimoRepository.ts
+    │   ├── LivroRepository.ts
+    │   ├── PostgresDb.ts
+    │   └── UsuarioRepository.ts
+    ├── services/                          # CAMADA DE NEGÓCIO (importam apenas Interfaces, Entities e Errors)
+    │   ├── EmprestimoService.ts
+    │   ├── LivroService.ts
+    │   ├── UsuarioService.ts
+    │   └── errors/
+    │       ├── NaoEncontradoError.ts
+    │       └── RegraDeNegocioError.ts
+    └── controllers/                       # CAMADA DE APRESENTAÇÃO (importam Express, Services e Errors)
+        ├── EmprestimoController.ts
+        ├── LivroController.ts
+        ├── UsuarioController.ts
+        └── tratarErro.ts
 ```
 
 ---
@@ -122,7 +108,7 @@ O fluxo de execução atravessa as camadas **exclusivamente de cima para baixo**
 
 ```mermaid
 flowchart TD
-    Cliente["Cliente HTTP (curl / Postman / Insomnia)"] -->|"Requisicao JSON"| Routes["Composicao Raiz e Rotas (src/routes.ts)"]
+    Cliente["Cliente HTTP (Postman / Insomnia / curl)"] -->|"Requisicao JSON"| Routes["Composicao Raiz e Rotas (src/routes.ts)"]
     Routes -->|"Despacha para"| Controllers["Camada de Apresentacao: Controllers (src/controllers)"]
     Controllers -->|"Chama regras de negocio"| Services["Camada de Negocio: Services (src/services)"]
     Services -->|"Depende de abstracao (DIP)"| Interfaces["Contratos: ILivroRepository, IUsuarioRepository, IEmprestimoRepository"]
@@ -181,7 +167,7 @@ O **Princípio da Inversão de Dependência (DIP — letra D do SOLID)** afirma 
      constructor(private livroRepository: ILivroRepository) {}
    }
    ```
-   Repare que `LivroService` não sabe se os dados vêm do PostgreSQL, do MongoDB ou de um array na memória RAM.
+   Repare que `LivroService` não sabe se os dados vêm do PostgreSQL, do MongoDB ou de qualquer outra fonte de persistência.
 
 3. **O Repositório implementa o contrato (`src/repositories/LivroRepository.ts`)**:
    ```ts
@@ -278,14 +264,14 @@ erDiagram
 
 ## 10. Guia Arquivo por Arquivo
 
-- **`package.json`**: Define scripts (`dev`, `typecheck`, `test`), dependências (`express`, `pg`, `typescript`, `tsx`, `@types/*`) e documenta tudo na chave `"//"`.
-- **`tsconfig.json`**: Configura TypeScript estrito (`strict: true`, `module: "nodenext"`, `types: ["node"]`, `noEmit: true`) cobrindo `src/` e `tests/`.
+- **`package.json`**: Define scripts (`dev`, `typecheck`), dependências (`express`, `pg`, `typescript`, `tsx`, `@types/*`) e documenta tudo na chave `"//"`.
+- **`tsconfig.json`**: Configura TypeScript estrito (`strict: true`, `module: "nodenext"`, `types: ["node"]`, `noEmit: true`) cobrindo `src/`.
 - **`.gitignore` / `.dockerignore`**: Mantêm `node_modules` fora do Git e impedem que binários compilados para macOS (como o `esbuild` do `tsx`) entrem na imagem Linux Alpine.
 - **`Dockerfile`**: Usa `node:24-alpine`, instala dependências dentro do Linux e inicia com `npm run dev`.
 - **`docker-compose.yml`**: Sobe `biblioteca_db` (Postgres 15 com `init.sql` e `healthcheck` TCP) e `biblioteca_api` (`depends_on: service_healthy`), mapeando `${DB_HOST_PORT:-5434}:5432` para o host.
 - **`init.sql`**: Script DDL que cria `usuarios`, `livros` e `emprestimos`.
 - **`src/entities/*.ts`**: Classes puras `Livro`, `Usuario` e `Emprestimo` usando *parameter properties*.
-- **`src/interfaces/*.ts`**: Contratos `ILivroRepository`, `IUsuarioRepository` e `IEmprestimoRepository` usados pelos Services e implementados tanto pelos repositórios Postgres quanto pelos fakes de teste.
+- **`src/interfaces/*.ts`**: Contratos `ILivroRepository`, `IUsuarioRepository` e `IEmprestimoRepository` usados pelos Services e implementados pelos repositórios PostgreSQL.
 - **`src/repositories/PostgresDb.ts`**: Instancia o `Pool` do `pg` lendo variáveis de ambiente (com fallback `localhost` e porta `'5434'` para rodar fora do Docker).
 - **`src/repositories/*Repository.ts`**: Executam SQL parametrizado (`$1`, `$2...`), ordenam listagens com `ORDER BY id` e convertem linhas `snake_case` do banco em entidades `camelCase` via método privado `paraEntidade`.
 - **`src/services/errors/*.ts`**: Hierarquia de erros de negócio (`RegraDeNegocioError` e `NaoEncontradoError`) desacoplada do Express.
@@ -293,8 +279,6 @@ erDiagram
 - **`src/controllers/tratarErro.ts` e `*Controller.ts`**: Recebem `req`/`res`, usam fallback `req.body ?? {}` (necessário no Express 5), delegam ao Service e formatam respostas JSON (200/201/400/404/500).
 - **`src/routes.ts`**: Instancia repositórios, services e controllers manualmente e registra as 5 rotas HTTP.
 - **`src/index.ts`**: Cria o app Express, aplica `express.json()` e `router`, e escuta na porta `3000`.
-- **`tests/fakes/*.ts` e `tests/services/*.test.ts`**: Simulam os repositórios em memória RAM e testam 14 cenários dos 3 Services sem precisar do PostgreSQL.
-- **`scripts/demo.sh`**: Executa via `curl` uma demonstração ponta a ponta das rotas e do erro de livro já emprestado.
 
 ---
 
@@ -316,10 +300,12 @@ Cada etapa da construção foi registrada em um commit atômico e enviada ao Git
 | 9 | `1abb828` | `feat: controllers da camada de apresentacao` | `tratarErro.ts` e os 3 Controllers |
 | 10 *(fix)* | `4ed7977` | `fix: porta externa do postgres configuravel com padrao 5434` | Resolução real de conflito de porta no host (5432 local e 5433 outro container) usando `${DB_HOST_PORT:-5434}:5432` |
 | 11 | `bffefb5` | `feat: finalizacao da api com rotas, injecao manual e servidor` | `src/routes.ts` (DI manual + 5 rotas) e `src/index.ts` |
-| 12 | `3329020` | `test: testes unitarios dos servicos com repositorios em memoria` | 3 repositórios fake em memória + 14 testes com `node:test` |
-| 13 | `bba8c30` | `chore: script de demonstracao da api com curl` | `scripts/demo.sh` executável e comentado |
-| 14 | *(este passo)* | `docs: tutorial completo de construcao, comunicacao e execucao` | `docs/TUTORIAL.md` e atualização do `README.md` |
-| 15 | *(próximo passo)* | `docs: roteiro de apresentacao em slides` | `docs/ROTEIRO_APRESENTACAO.md` |
+| 12 | `3329020` | `test: testes unitarios dos servicos com repositorios em memoria` | Adição temporária de suíte unitária (removida posteriormente no commit `73ab423`) |
+| 13 | `bba8c30` | `chore: script de demonstracao da api com curl` | Script auxiliar de demonstração (removido posteriormente no commit `73ab423`) |
+| 14 | `abea4e1` | `docs: tutorial completo de construcao, comunicacao e execucao` | Primeira versão de `docs/TUTORIAL.md` e atualização do `README.md` |
+| 15 | `284b474` | `docs: roteiro de apresentacao em slides` | Primeira versão de `docs/ROTEIRO_APRESENTACAO.md` |
+| 16 | `73ab423` | `chore: remove testes unitarios, script demo e referencias em codigo` | Limpeza do projeto para manter apenas o código essencial da apresentação |
+| 17 | *(este passo)* | `docs: atualiza documentacao e roteiro removendo itens nao essenciais` | Atualização do `README.md`, `docs/TUTORIAL.md` e `docs/ROTEIRO_APRESENTACAO.md` |
 
 > **Nota didática sobre o commit `4ed7977` (`fix`)**: Ao subir os containers pela primeira vez, o Docker reportou `Bind for 0.0.0.0:5433 failed: port is already allocated`, pois a máquina já possuía um PostgreSQL local na porta `5432` e outro container do usuário (`postgres_padrao`) na `5433`. Alterar o mapeamento para `${DB_HOST_PORT:-5434}:5432` e atualizar o fallback em `PostgresDb.ts` para `'5434'` resolveu o conflito mantendo a rede interna `db:5432` intacta.
 
@@ -327,7 +313,7 @@ Cada etapa da construção foi registrada em um commit atômico e enviada ao Git
 
 ## 12. Como Rodar o Projeto
 
-### Opção 1: Tudo no Docker (Recomendado para apresentação e produção local)
+### Opção 1: Tudo no Docker (Recomendado para a apresentação)
 
 1. Certifique-se de que o Docker (OrbStack ou Docker Desktop) está aberto e rodando.
 2. Na raiz do projeto, execute:
@@ -351,21 +337,11 @@ npm run dev
 ```
 O `PostgresDb.ts` usará automaticamente `localhost:5434` para falar com o container `biblioteca_db`.
 
-### Rodando Testes Unitários e Checagem de Tipos (Sem precisar de Docker)
+### Checagem de Tipos TypeScript
 
 ```bash
-# Valida toda a tipagem estrita TypeScript (src/ e tests/)
+# Valida toda a tipagem estrita TypeScript em src/
 npm run typecheck
-
-# Roda os 14 testes unitários com repositórios em memória
-npm test
-```
-
-### Rodando a Demonstração Automatizada (`curl`)
-
-Com a API rodando na porta `3000`:
-```bash
-./scripts/demo.sh
 ```
 
 ---
@@ -494,4 +470,4 @@ Todas as rotas aceitam e retornam `Content-Type: application/json`.
 - **Atomicidade de transação no empréstimo**: `EmprestimoService.realizarEmprestimo` executa `emprestimoRepository.salvar` e depois `livroRepository.atualizarDisponibilidade` em duas chamadas separadas, sem envolver ambas em uma transação SQL (`BEGIN ... COMMIT`). Em produção, um padrão *Unit of Work* ou método transacional garantiria atomicidade completa.
 - **Rota de devolução de livros**: Propositalmente deixada fora das 5 rotas iniciais para cumprir o escopo do trabalho e servir de exercício de extensibilidade na arguição (`POST /emprestimos/:id/devolucao`).
 - **Paginação e filtros**: As rotas `GET /livros` e `GET /emprestimos` retornam todos os registros ordenados por `id`; em acervos grandes, parâmetros `?page=` e `?limit=` seriam recomendados.
-- **Testes de integração HTTP**: Os testes atuais validam unitariamente toda a camada de negócio em memória; adicionar testes de integração com `supertest` ou banco isolado complementaria a cobertura ponta a ponta.
+- **Testes automatizados futuros**: Como o projeto mantém apenas o código essencial para a apresentação, adicionar futuramente suítes unitárias (injetando implementações em memória nas interfaces DIP) e de integração HTTP aumentaria a cobertura contra regressões.
